@@ -51,6 +51,7 @@ public class TextToGraph1 extends JFrame{
         chooseFileButton = new JButton("Choose Text File");
         buildGraphButton = new JButton("Build Graph");
         queryButton = new JButton("Query BridgeWords");
+        insertButton = new JButton("Insert BridgeWords");
         EXITBUTTON=new JButton("exit!");
         //TODO
 
@@ -61,6 +62,7 @@ public class TextToGraph1 extends JFrame{
         controlPanel.add(buildGraphButton);
         controlPanel.add(queryButton);
         controlPanel.add(EXITBUTTON);
+        controlPanel.add(insertButton);
         add(controlPanel, BorderLayout.SOUTH);
         //TODO
 
@@ -146,6 +148,27 @@ public class TextToGraph1 extends JFrame{
                 }
             }
         });
+
+        insertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 提示用户输入文本
+                String newText = JOptionPane.showInputDialog(TextToGraph1.this, "Enter a new line of text:");
+
+                // 如果用户未输入任何内容，则不进行操作
+                if (newText == null || newText.isEmpty()) {
+                    textArea.append("No text entered. Bridge word insertion canceled.\n");
+                    return;
+                }
+
+                // 生成带有桥接词的新文本
+                String newTextWithBridgeWords = insertBridgeWords(newText);
+                textArea.append("your text:" + newText + "\n");
+                textArea.append("new text:" + newTextWithBridgeWords + "\n");
+            }
+        });
+
+
 
         //TODO
 
@@ -295,7 +318,27 @@ public class TextToGraph1 extends JFrame{
     }
 
     //功能4：根据bridge word生成新文本 TODO
-//    public String insertBridgeWords(String text)
+    public String insertBridgeWords(String text) {
+        StringBuilder result = new StringBuilder();
+        String[] words = text.split("\\s+"); // 按空格分割单词
+        for (int i = 0; i < words.length - 1; i++) {
+            String currentWord = words[i];
+            String nextWord = words[i + 1];
+            result.append(currentWord).append(" ");
+            if (textToGraph.containsKey(currentWord) && textToGraph.containsKey(nextWord)) {
+                List<String> bridgeWords = queryBridgeWords(currentWord, nextWord, false);
+                if (!bridgeWords.isEmpty()) {
+                    // 如果存在桥接词，则随机选择一个桥接词插入
+                    Random random = new Random();
+                    String selectedBridgeWord = new ArrayList<>(bridgeWords).get(random.nextInt(bridgeWords.size()));
+                    result.append(selectedBridgeWord).append(" ");
+                }
+            }
+        }
+        result.append(words[words.length - 1]); // 添加最后一个单词
+        return result.toString();
+    }
+
 
     //功能5：最短路径
     public static Map<List<String>, Integer> calcShortestPath(String start, String end) {
