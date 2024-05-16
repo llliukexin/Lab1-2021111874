@@ -27,7 +27,6 @@ public class TextToGraph1 extends JFrame{
 
     private JTextField word1Field;
     private JTextField word2Field;
-
     private File selectedFile;
 
     public TextToGraph1() {
