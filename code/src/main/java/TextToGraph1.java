@@ -52,8 +52,7 @@ public class TextToGraph1 extends JFrame{
         buildGraphButton = new JButton("Build Graph");
         queryButton = new JButton("Query BridgeWords");
         insertButton = new JButton("Insert BridgeWords");
-        shortestPathButton = new JButton("Calculate Shortest Path");
-        randomPathButton = new JButton("Random Path");
+
         EXITBUTTON=new JButton("exit!");
         //TODO
 
@@ -66,8 +65,6 @@ public class TextToGraph1 extends JFrame{
         controlPanel.add(insertButton);
         controlPanel.add(EXITBUTTON);
         controlPanel.add(insertButton);
-        controlPanel.add(shortestPathButton);
-        controlPanel.add(randomPathButton);
         add(controlPanel, BorderLayout.SOUTH);
         //TODO
 
@@ -173,49 +170,6 @@ public class TextToGraph1 extends JFrame{
             }
         });
 
-        shortestPathButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String word1 = JOptionPane.showInputDialog(TextToGraph1.this, "Enter the first word:").toLowerCase();
-                String word2 = JOptionPane.showInputDialog(TextToGraph1.this, "Enter the second word(or not):").toLowerCase();
-                String dotFilePath = "./result/marked_graph_all.dot"; // 标注后的 DOT 文件路径
-                String pngFilePath = "./result/marked_graph_all.png";
-                if(word2.isEmpty() && textToGraph.containsKey(word1)){
-                    textArea.append(shortestPathsFromSingleWord(word1));
-                } else if (textToGraph.containsKey(word1) && textToGraph.containsKey(word2)) {
-                    Map<List<String>, Integer>  shortestPath = calcShortestPath(word1, word2);
-                    if (!shortestPath.isEmpty()) {
-                        textArea.append("Shortest path from " + word1 + " to " + word2 + ": " + WordListFormatter(shortestPath,null) + "\n");
-                        convertDotFile(dotFilePath,shortestPath);
-                        convertDotToImage(dotFilePath,pngFilePath);
-                        displayImage(pngFilePath);
-                        if (dotFilePath != null) {
-                            textArea.append("Shortest path image generated: " + dotFilePath + "\n");
-                        } else {
-                            textArea.append("Failed to generate shortest path image.\n");
-                        }
-                    } else {
-                        textArea.append("No path found between " + word1 + " and " + word2 + "\n");
-                    }
-                }else {
-                    textArea.append("Invalid input.\n");
-                }
-
-
-            }
-        });
-
-        randomPathButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String dotRandFilePath = "./result/marked_rand_graph.dot"; // 标注后的 DOT 文件路径
-                List<String> randomPath = randomTraversalForGUI(textArea);
-                dotRandFilePath = markAndDisplayShortestPath(randomPath,dotRandFilePath);
-//                textToGraph.displayImage(dotRandFilePath);
-                textArea.append(WordListFormatter(null, randomPath) + "\n");
-                textArea.append("Random traversal completed. Results written to './result/random_traversal.txt'.\n");
-            }
-        });
 
 
 
