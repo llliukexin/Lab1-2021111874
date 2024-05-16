@@ -51,6 +51,9 @@ public class TextToGraph1 extends JFrame{
         chooseFileButton = new JButton("Choose Text File");
         buildGraphButton = new JButton("Build Graph");
         queryButton = new JButton("Query BridgeWords");
+        insertButton = new JButton("Insert BridgeWords");
+        shortestPathButton = new JButton("Calculate Shortest Path");
+        randomPathButton = new JButton("Random Path");
         EXITBUTTON=new JButton("exit!");
         //TODO
 
@@ -60,7 +63,11 @@ public class TextToGraph1 extends JFrame{
         controlPanel.add(chooseFileButton);
         controlPanel.add(buildGraphButton);
         controlPanel.add(queryButton);
+        controlPanel.add(insertButton);
         controlPanel.add(EXITBUTTON);
+        controlPanel.add(insertButton);
+        controlPanel.add(shortestPathButton);
+        controlPanel.add(randomPathButton);
         add(controlPanel, BorderLayout.SOUTH);
         //TODO
 
@@ -147,6 +154,71 @@ public class TextToGraph1 extends JFrame{
             }
         });
 
+        insertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 提示用户输入文本
+                String newText = JOptionPane.showInputDialog(TextToGraph1.this, "Enter a new line of text:");
+
+                // 如果用户未输入任何内容，则不进行操作
+                if (newText == null || newText.isEmpty()) {
+                    textArea.append("No text entered. Bridge word insertion canceled.\n");
+                    return;
+                }
+
+                // 生成带有桥接词的新文本
+                String newTextWithBridgeWords = insertBridgeWords(newText);
+                textArea.append("your text:" + newText + "\n");
+                textArea.append("new text:" + newTextWithBridgeWords + "\n");
+            }
+        });
+
+        shortestPathButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String word1 = JOptionPane.showInputDialog(TextToGraph1.this, "Enter the first word:").toLowerCase();
+                String word2 = JOptionPane.showInputDialog(TextToGraph1.this, "Enter the second word(or not):").toLowerCase();
+                String dotFilePath = "./result/marked_graph_all.dot"; // 标注后的 DOT 文件路径
+                String pngFilePath = "./result/marked_graph_all.png";
+                if(word2.isEmpty() && textToGraph.containsKey(word1)){
+                    textArea.append(shortestPathsFromSingleWord(word1));
+                } else if (textToGraph.containsKey(word1) && textToGraph.containsKey(word2)) {
+                    Map<List<String>, Integer>  shortestPath = calcShortestPath(word1, word2);
+                    if (!shortestPath.isEmpty()) {
+                        textArea.append("Shortest path from " + word1 + " to " + word2 + ": " + WordListFormatter(shortestPath,null) + "\n");
+                        convertDotFile(dotFilePath,shortestPath);
+                        convertDotToImage(dotFilePath,pngFilePath);
+                        displayImage(pngFilePath);
+                        if (dotFilePath != null) {
+                            textArea.append("Shortest path image generated: " + dotFilePath + "\n");
+                        } else {
+                            textArea.append("Failed to generate shortest path image.\n");
+                        }
+                    } else {
+                        textArea.append("No path found between " + word1 + " and " + word2 + "\n");
+                    }
+                }else {
+                    textArea.append("Invalid input.\n");
+                }
+
+
+            }
+        });
+
+        randomPathButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String dotRandFilePath = "./result/marked_rand_graph.dot"; // 标注后的 DOT 文件路径
+                List<String> randomPath = randomTraversalForGUI(textArea);
+                dotRandFilePath = markAndDisplayShortestPath(randomPath,dotRandFilePath);
+//                textToGraph.displayImage(dotRandFilePath);
+                textArea.append(WordListFormatter(null, randomPath) + "\n");
+                textArea.append("Random traversal completed. Results written to './result/random_traversal.txt'.\n");
+            }
+        });
+
+
+
         //TODO
 
         EXITBUTTON.addActionListener(new ActionListener() {
@@ -197,7 +269,21 @@ public class TextToGraph1 extends JFrame{
     }
 
     //打印有向图 TODO
-//    public void printGraph()
+    public void printGraph() {
+        System.out.println("Vertices and edges in the graph:");
+        for (Map.Entry<String, Map<String, Integer>> entry : textToGraph.entrySet()) {
+            String vertex = entry.getKey();
+            Map<String, Integer> edges = entry.getValue();
+            System.out.print(vertex + ": ");
+            for (Map.Entry<String, Integer> edge : edges.entrySet()) {
+                String destination = edge.getKey();
+                int weight = edge.getValue();
+                System.out.print("(" + vertex + " -> " + destination + ": " + weight + "), ");
+            }
+            System.out.println();
+        }
+    }
+
 
 
 
@@ -238,7 +324,59 @@ public class TextToGraph1 extends JFrame{
     }
 
     //TODO
-//    public void convertDotFile(String dotFilePath, Map<List<String>, Integer>  shortPaths)
+    public void convertDotFile(String dotFilePath, Map<List<String>, Integer>  shortPaths) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(dotFilePath))) {
+            String[] colors = {"red", "blue", "green", "orange", "purple", "yellow", "brown", "cyan"};
+
+            // 为每个最短路径选择颜色
+            Map<List<String>, String> pathColors = new HashMap<>();
+            for (Map.Entry<List<String>, Integer> entry : shortPaths.entrySet())
+            {
+                List<String> path=entry.getKey();
+                String color = colors[pathColors.size() % colors.length];
+                pathColors.put(path, color);
+            }
+            try (BufferedReader br = new BufferedReader(new FileReader("./result/directed_graph.dot"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("->")) {
+                        String[] parts = line.split("->");
+                        String fromNode = parts[0].trim();
+                        String toNode = parts[1].trim().split("\\[")[0].trim();
+                        for (Map.Entry<List<String>, Integer> entry : shortPaths.entrySet()) {
+                            // 如果起始节点和终止节点在最短路径集合中，则修改颜色
+                            List<String> path=entry.getKey();
+                            if (path.contains(fromNode) && path.contains(toNode)
+                                    && !fromNode.equals(path.get(path.size() - 1))
+                                    && (path.indexOf(toNode) - path.indexOf(fromNode) == 1)) {
+                                if (parts[1].trim().endsWith(";")) {
+                                    // 如果是，删除最后一个字符';'
+                                    parts[1] = parts[1].trim().substring(0, parts[1].trim().length() - 1);
+                                }
+                                String color = pathColors.get(path);
+                                line = "\t" + parts[0].trim() + " -> " + parts[1] + " [color=" + color + "];";
+                                break; // 只需要为同一路径内的边选择一种颜色
+                            }
+                        }
+                    }
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+//            ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tpng", "./result/marked_graph_all.dot", "-o", "./result/marked_graph_all.png");
+//            Process process = processBuilder.start();
+//            int exitCode = process.waitFor();
+//            if (exitCode == 0) {
+//                System.out.println("Image file generated: " + "marked_graph_all.png");
+//                // 在屏幕上显示图像
+//                displayImage("./result/marked_graph_all.png");
+//            } else {
+//                System.out.println("Failed to generate image file.");
+//            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     //功能三：桥接词查询
@@ -295,7 +433,28 @@ public class TextToGraph1 extends JFrame{
     }
 
     //功能4：根据bridge word生成新文本 TODO
-//    public String insertBridgeWords(String text)
+    public String insertBridgeWords(String text) {
+        StringBuilder result = new StringBuilder();
+        String[] words = text.split("\\s+"); // 按空格分割单词
+        for (int i = 0; i < words.length - 1; i++) {
+            String currentWord = words[i];
+            String nextWord = words[i + 1];
+            result.append(currentWord).append(" ");
+            if (textToGraph.containsKey(currentWord) && textToGraph.containsKey(nextWord)) {
+                List<String> bridgeWords = queryBridgeWords(currentWord, nextWord, false);
+                if (!bridgeWords.isEmpty()) {
+                    // 如果存在桥接词，则随机选择一个桥接词插入
+                    Random random = new Random();
+                    String selectedBridgeWord = new ArrayList<>(bridgeWords).get(random.nextInt(bridgeWords.size()));
+                    result.append(selectedBridgeWord).append(" ");
+                }
+            }
+        }
+        result.append(words[words.length - 1]); // 添加最后一个单词
+        return result.toString();
+    }
+
+
 
     //功能5：最短路径
     public static Map<List<String>, Integer> calcShortestPath(String start, String end) {

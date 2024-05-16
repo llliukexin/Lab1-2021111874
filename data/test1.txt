@@ -1,2 +1,3 @@
 To @ explore  strange new worlds,to see new wonderful and beautiful life,
 To seek out new  life and new civilizations?
+throw new RuntimeException(e);
