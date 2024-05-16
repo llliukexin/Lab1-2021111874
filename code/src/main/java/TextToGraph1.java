@@ -55,7 +55,6 @@ public class TextToGraph1 extends JFrame{
         shortestPathButton = new JButton("Calculate Shortest Path");
         randomPathButton = new JButton("Random Path");
         EXITBUTTON=new JButton("exit!");
-        //TODO
 
         word1Field = new JTextField(10);
         word2Field = new JTextField(10);
@@ -69,7 +68,6 @@ public class TextToGraph1 extends JFrame{
         controlPanel.add(randomPathButton);
         controlPanel.add(EXITBUTTON);
         add(controlPanel, BorderLayout.SOUTH);
-        //TODO
 
         //TextToGraph textToGraph = new TextToGraph();
 
@@ -218,9 +216,6 @@ public class TextToGraph1 extends JFrame{
         });
 
 
-
-        //TODO
-
         EXITBUTTON.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,6 +241,7 @@ public class TextToGraph1 extends JFrame{
     public static void addEdge(String source, String destination) {
         textToGraph.get(source).merge(destination, 1, Integer::sum);
     }
+
     //功能一：构建有向图
     public static void buildDirectedGraph(String filePath) throws IOException {
         textToGraph.clear();
@@ -283,10 +279,6 @@ public class TextToGraph1 extends JFrame{
             System.out.println();
         }
     }
-
-
-
-
 
     //功能2：有向图可视化
     public void generateDotFile(String dotFilePath) {
@@ -378,7 +370,6 @@ public class TextToGraph1 extends JFrame{
         }
     }
 
-
     //功能三：桥接词查询
     public List<String> queryBridgeWords(String start, String end, Boolean print) {
         List<String> bridgeWords = new ArrayList<>();
@@ -453,8 +444,6 @@ public class TextToGraph1 extends JFrame{
         result.append(words[words.length - 1]); // 添加最后一个单词
         return result.toString();
     }
-
-
 
     //功能5：最短路径
     public static Map<List<String>, Integer> calcShortestPath(String start, String end) {
@@ -712,7 +701,7 @@ public class TextToGraph1 extends JFrame{
     }
 
     //功能6：游走路径
-    public static void randomTraversal() {
+    public static void randomTravergial() {
         try {
             // 创建文件写入器
             PrintWriter writer = new PrintWriter(new FileWriter("./result/random_traversal.txt"));
