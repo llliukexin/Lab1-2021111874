@@ -63,6 +63,7 @@ public class TextToGraph1 extends JFrame{
         controlPanel.add(queryButton);
         controlPanel.add(insertButton);
         controlPanel.add(EXITBUTTON);
+        controlPanel.add(insertButton);
         add(controlPanel, BorderLayout.SOUTH);
         //TODO
 
@@ -167,6 +168,9 @@ public class TextToGraph1 extends JFrame{
                 textArea.append("new text:" + newTextWithBridgeWords + "\n");
             }
         });
+
+
+
 
         //TODO
 
@@ -336,6 +340,8 @@ public class TextToGraph1 extends JFrame{
         result.append(words[words.length - 1]); // 添加最后一个单词
         return result.toString();
     }
+
+
 
     //功能5：最短路径
     public static Map<List<String>, Integer> calcShortestPath(String start, String end) {
