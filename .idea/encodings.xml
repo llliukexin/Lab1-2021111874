@@ -3,7 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/code/src/main/java/Graph.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/code/src/main/java/TextToGraph.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/code/src/main/java/TextToGraph1.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/code/src/main/java/UI.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/code/src/main/java/UI.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/code/src/main/test/test/calcShortestPathTest.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/data/lab3.txt" charset="GBK" />
   </component>
 </project>

@@ -1,14 +1,10 @@
 digraph G {
-	new -> worlds [label="2"];
-	new -> life [label="1"] [color=red];
-	worlds -> to [label="1"] [color=red];
-	worlds -> civilizations [label="1"];
-	explore -> strange [label="1"] [color=blue];
-	and -> new [label="1"];
-	to -> explore [label="1"] [color=blue];
-	to -> seek [label="1"] [color=red];
-	seek -> out [label="1"] [color=red];
-	strange -> new [label="1"] [color=blue];
-	life -> and [label="1"];
-	out -> new [label="1"] [color=red];
+	a -> b [label="1"] [color=red];
+	a -> c [label="1"] [color=blue];
+	b -> d [label="1"] [color=red];
+	c -> d [label="1"] [color=blue];
+	d -> e [label="1"] [color=red];
+	d -> f [label="1"];
+	e -> f [label="1"];
+	f -> a [label="1"];
 }
